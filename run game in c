@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <conio.h>
+#include <windows.h>
+
+// Function to set the cursor position
+void gotoxy(int x, int y) {
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+
+// Function to clear the screen
+void clearScreen() {
+    system("cls");
+}
+
+// Player structure
+struct Player {
+    int x;
+    int y;
+    int width;
+    int height;
+    int speed;
+    int isJumping;
+    int jumpHeight;
+    int jumpCount;
+};
+
+// Initialize the player
+void initPlayer(struct Player* player) {
+    player->x = 2;
+    player->y = 20;
+    player->width = 2;
+    player->height = 2;
+    player->speed = 1;
+    player->isJumping = 0;
+    player->jumpHeight = 5;
+    player->jumpCount = 0;
+}
+
+// Keyboard input handling
+void handleInput(struct Player* player) {
+    if (_kbhit()) {
+        int key = _getch();
+        if (key == 224) {
+            key = _getch();
+            if (key == 72 && !player->isJumping) { // Up arrow key
+                player->isJumping = 1;
+                player->jumpCount = 0;
+            }
+            else if (key == 80) { // Down arrow key
+                player->y += player->speed;
+            }
+        }
+    }
+}
+
+// Update player position
+void updatePlayer(struct Player* player) {
+    if (player->isJumping) {
+        player->y -= player->speed;
+        player->jumpCount += player->speed;
+        
+        if (player->jumpCount >= player->jumpHeight) {
+            player->isJumping = 0;
+        }
+    }
+}
+
+// Draw the player
+void drawPlayer(struct Player* player) {
+    gotoxy(player->x, player->y);
+    printf("##\n");
+    printf("##\n");
+}
+
+// Game loop
+void gameLoop() {
+    struct Player player;
+    initPlayer(&player);
+    
+    while (1) {
+        clearScreen();
+        handleInput(&player);
+        updatePlayer(&player);
+        drawPlayer(&player);
+        Sleep(20); // Pause to control the game speed
+    }
+}
+
+int main() {
+    gameLoop();
+    return 0;
+}
